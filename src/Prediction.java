@@ -2,6 +2,7 @@ public class Prediction {
     public Double score0;
     public Double score1;
     private String content;
+    private String result;
 
     public Prediction(TrainMultinomialNB trainMultinomialNB0, TrainMultinomialNB trainMultinomialNB1,String Content){
         score0 = Math.log(trainMultinomialNB0.getPriorPro())/Math.log(2);
@@ -31,5 +32,13 @@ public class Prediction {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public void setResult(String result) {
+        this.result = result;
     }
 }

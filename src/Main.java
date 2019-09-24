@@ -6,18 +6,20 @@ public class Main {
 
     public static void main(String[] args) {
 
-        System.out.println("Hello World!");
+        System.out.println("Let's begin training!");
         ///Reading the file
         DataConfiguration dataConfiguration = new DataConfiguration();
-       // String trainData = dataConfiguration.readFile("/Users/CharlesLiu/Desktop/ECE503" +
-                //"/Assignment1/DataConfiguration/fortune_cookies/traindata.txt");
-        //String trainLabel = dataConfiguration.readFile("/Users/CharlesLiu/Desktop/ECE503" +
-                //"/Assignment1/DataConfiguration/fortune_cookies/trainlabel.txt");
-        String trainData = dataConfiguration.readFile("C:/Users/charles/Desktop/" +
-                "/NaiveBayes/fortune_cookies/traindata.txt");
+        String trainData = dataConfiguration.readFile("/Users/CharlesLiu/Desktop/NaiveBayes/fortune_cookies/traindata.txt");
+        String trainLabel = dataConfiguration.readFile("/Users/CharlesLiu/Desktop/NaiveBayes/fortune_cookies/trainlabels.txt");
 
-        String trainLabel = dataConfiguration.readFile("C:/Users/charles/Desktop" +
-                "/NaiveBayes/fortune_cookies/trainlabels.txt");
+        String testDateContent = dataConfiguration.readFile("/Users/CharlesLiu/Desktop/NaiveBayes/fortune_cookies/testdata.txt");
+        String testLabelContent = dataConfiguration.readFile("/Users/CharlesLiu/Desktop/NaiveBayes/fortune_cookies/testlabels.txt");
+
+        //String trainData = dataConfiguration.readFile("C:/Users/charles/Desktop/" +
+               // "/NaiveBayes/fortune_cookies/traindata.txt");
+
+        //String trainLabel = dataConfiguration.readFile("C:/Users/charles/Desktop" +
+                //"/NaiveBayes/fortune_cookies/trainlabels.txt");
 
 
         TrainMultinomialNB trainBenoullinbOf1 = new TrainMultinomialNB(trainData,trainLabel,"1");
@@ -28,24 +30,46 @@ public class Main {
 
         List<Vocabulary> vocabulariesOfTrain = dataConfiguration.getVocabulary(trainData);
         List<Vocabulary> vocabulariesOfTrain1 = dataConfiguration.calTimesCondPro(vocabulariesOfTrain,dataof1);
+        vocabulariesOfTrain = dataConfiguration.getVocabulary(trainData);
         List<Vocabulary> vocabulariesOfTrain0 = dataConfiguration.calTimesCondPro(vocabulariesOfTrain,dataof0);
 
+        System.out.println("\nTrainingResult:\nprior prob of 0 is "+trainBenoullinbOf0.getPriorPro()
+                +"\nprior prob of 1 is "+ trainBenoullinbOf1.getPriorPro()+"\n");
+
         //Test part:
+        //Test on training Data
         String testData = trainData;
-        List<Prediction> predictions= new LinkedList<>();
-        int count = 0;
-        String[] linesOfTest = testData.split("\n");
-        for(String line:linesOfTest){
-            Prediction prediction = new Prediction(trainBenoullinbOf0,trainBenoullinbOf1,line);
-            List<Vocabulary> vocabulariesOfTest = dataConfiguration.getVocabulary(line);
-            for(Vocabulary vocabulary: vocabulariesOfTest){
-                prediction.score0 += Math.log(vocabulariesOfTrain0.get(vocabulariesOfTest.indexOf(vocabulary)).getConditionalProbability())/Math.log(2);
-                prediction.score1 += Math.log(vocabulariesOfTrain1.get(vocabulariesOfTest.indexOf(vocabulary)).getConditionalProbability())/Math.log(2);
-            }
-            predictions.add(prediction);
-        }
+        String testLabel = trainLabel;
 
+        TestMultinomailNB testMultinomailNB = new TestMultinomailNB();
+        testMultinomailNB = testMultinomailNB.test(testData,testLabel,trainBenoullinbOf0,trainBenoullinbOf1,
+                vocabulariesOfTrain,vocabulariesOfTrain0,vocabulariesOfTrain1);
 
-        System.out.println(predictions);
+        int confusionMatrix[][] = testMultinomailNB.getConfusionMatrix();
+        double rateOfMiss = testMultinomailNB.getRateOfMiss();
+
+        System.out.println("Test on Training Data done: ");
+        outputResult(confusionMatrix,rateOfMiss);
+
+        //Test on test data
+        testData = testDateContent;
+        testLabel = testLabelContent;
+
+        testMultinomailNB = testMultinomailNB.test(testData,testLabel,trainBenoullinbOf0,trainBenoullinbOf1,
+                vocabulariesOfTrain,vocabulariesOfTrain0,vocabulariesOfTrain1);
+
+        confusionMatrix = testMultinomailNB.getConfusionMatrix();
+        rateOfMiss = testMultinomailNB.getRateOfMiss();
+
+        System.out.println("\nTest on Test Data done: ");
+        outputResult(confusionMatrix,rateOfMiss);
+
+    }
+
+    private static void outputResult(int[][] confusionMatrix, Double missRate){
+        System.out.println("\nThe confusion matrix is :\n"
+                +confusionMatrix[0][0]+"     "+ confusionMatrix[0][1]+"\n"
+                +confusionMatrix[1][0]+"     "+confusionMatrix[1][1]);
+        System.out.println("\nThe Missclassification rate is "+missRate);
     }
 }

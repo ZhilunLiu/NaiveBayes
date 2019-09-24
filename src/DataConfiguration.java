@@ -60,13 +60,14 @@ public class DataConfiguration {
     }
 
     public List<Vocabulary> calTimesCondPro(List<Vocabulary> vocabularies, String data){
-        for(Vocabulary vocabularyInOtherLoop: vocabularies){
+        List<Vocabulary> inputVocabularies = vocabularies;
+        for(Vocabulary vocabularyInOtherLoop: inputVocabularies){
             String word = vocabularyInOtherLoop.getContent();
             vocabularyInOtherLoop.setAppearsTimes(countSameWord(data,word));
             double AppearsTimes = vocabularyInOtherLoop.getAppearsTimes();
-            vocabularyInOtherLoop.setConditionalProbability((AppearsTimes+1)/(AppearsTimes+vocabularies.size()));
+            vocabularyInOtherLoop.setConditionalProbability((AppearsTimes+1)/(AppearsTimes+inputVocabularies.size()));
         }
-        return vocabularies;
+        return inputVocabularies;
     }
 
     public Double countSameWord(String data, String word){
