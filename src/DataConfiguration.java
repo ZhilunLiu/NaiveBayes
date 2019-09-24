@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -16,13 +17,14 @@ public class DataConfiguration {
             File file = new File(path);
             BufferedReader buffer = new BufferedReader(new FileReader(file));
             String data = "";
-            while(buffer.readLine()!=null){
-                data = data.concat( "\n"+buffer.readLine());
+            String newLine;
+            while((newLine = buffer.readLine())!=null){
+                data = data.concat( "\n"+newLine);
             }
 
             return data;
         }catch(Exception e){
-            return "something goes wrong";
+            return "Reading File failed";
         }
     }
 
@@ -30,35 +32,41 @@ public class DataConfiguration {
     public List<Vocabulary> getVocabulary(String data){
         try{
             Scanner scanner = new Scanner(data);
-            List<Vocabulary> vocabularies = null;
-            outterloop:
+            List<Vocabulary> vocabularies = new ArrayList<Vocabulary>();
             while(scanner.hasNext()){
                 String nextVocabulary = scanner.next();
                 if(vocabularies.isEmpty()){
                     Vocabulary vocabulary = new Vocabulary(nextVocabulary);
                     vocabularies.add(vocabulary);
                 }
-                for(Vocabulary vocabularyInLoop : vocabularies){
-                    if(nextVocabulary.equals(vocabularyInLoop.getContent())){
-                        break outterloop;
+                outterloop:
+                while(true) {
+                    for (Vocabulary vocabularyInLoop : vocabularies) {
+                        if (nextVocabulary.equals(vocabularyInLoop.getContent())) {
+                            break outterloop;
+                        }
                     }
                     Vocabulary vocabulary = new Vocabulary(nextVocabulary);
                     vocabularies.add(vocabulary);
+                    break outterloop;
                 }
             }
 
-            for(Vocabulary vocabularyInOtherLoop: vocabularies){
-                String word = vocabularyInOtherLoop.getContent();
-                vocabularyInOtherLoop.setAppearsTimes(countSameWord(data,word));
-                double AppearsTimes = vocabularyInOtherLoop.getAppearsTimes();
-                vocabularyInOtherLoop.setConditionalProbability((AppearsTimes+1)/(AppearsTimes+2));
-            }
             return vocabularies;
         }catch (Exception e){
             System.out.println("Exception is "+e );
             return null;
         }
+    }
 
+    public List<Vocabulary> calTimesCondPro(List<Vocabulary> vocabularies, String data){
+        for(Vocabulary vocabularyInOtherLoop: vocabularies){
+            String word = vocabularyInOtherLoop.getContent();
+            vocabularyInOtherLoop.setAppearsTimes(countSameWord(data,word));
+            double AppearsTimes = vocabularyInOtherLoop.getAppearsTimes();
+            vocabularyInOtherLoop.setConditionalProbability((AppearsTimes+1)/(AppearsTimes+vocabularies.size()));
+        }
+        return vocabularies;
     }
 
     public Double countSameWord(String data, String word){
