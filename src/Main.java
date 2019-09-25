@@ -1,3 +1,4 @@
+import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,17 +10,15 @@ public class Main {
         System.out.println("Let's begin training!");
         ///Reading the file
         DataConfiguration dataConfiguration = new DataConfiguration();
-        String trainData = dataConfiguration.readFile("/Users/CharlesLiu/Desktop/NaiveBayes/fortune_cookies/traindata.txt");
-        String trainLabel = dataConfiguration.readFile("/Users/CharlesLiu/Desktop/NaiveBayes/fortune_cookies/trainlabels.txt");
+        File currentDir = new File("");
+        String curDir = currentDir.getAbsolutePath();
+        String trainData = dataConfiguration.readFile(curDir+"/fortune_cookies/traindata.txt");
+        String trainLabel = dataConfiguration.readFile(curDir+"/fortune_cookies/trainlabels.txt");
+        //String trainData = dataConfiguration.readFile("/Users/CharlesLiu/Desktop/NaiveBayes/fortune_cookies/traindata.txt");
+        //String trainLabel = dataConfiguration.readFile("/Users/CharlesLiu/Desktop/NaiveBayes/fortune_cookies/trainlabels.txt");
 
-        String testDateContent = dataConfiguration.readFile("/Users/CharlesLiu/Desktop/NaiveBayes/fortune_cookies/testdata.txt");
-        String testLabelContent = dataConfiguration.readFile("/Users/CharlesLiu/Desktop/NaiveBayes/fortune_cookies/testlabels.txt");
-
-        //String trainData = dataConfiguration.readFile("C:/Users/charles/Desktop/" +
-               // "/NaiveBayes/fortune_cookies/traindata.txt");
-
-        //String trainLabel = dataConfiguration.readFile("C:/Users/charles/Desktop" +
-                //"/NaiveBayes/fortune_cookies/trainlabels.txt");
+        String testDateContent = dataConfiguration.readFile(curDir+"/fortune_cookies/testdata.txt");
+        String testLabelContent = dataConfiguration.readFile(curDir+"/fortune_cookies/testlabels.txt");
 
 
         TrainMultinomialNB trainBenoullinbOf1 = new TrainMultinomialNB(trainData,trainLabel,"1");
